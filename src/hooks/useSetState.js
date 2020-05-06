@@ -1,5 +1,7 @@
 import { useState, useCallback } from "react";
-import { isFunction, isPlainObject } from "../helpers";
+
+import isFunction from "../helpers/isFunction";
+import isPlainObject from "../helpers/isPlainObject";
 
 function useSetState(initialState = {}, props = {}) {
   const [state, setState] = useState(initialState);
