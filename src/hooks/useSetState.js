@@ -3,36 +3,37 @@ import { useState, useEffect, useRef } from "react";
 import isFunction from "../helpers/isFunction";
 import isPlainObject from "../helpers/isPlainObject";
 
-const noopFunction = () => {}
+const noopFunction = () => {};
 
 function useSetState(initialState = {}, props = {}) {
-  const [state, setState] = useState(initialState);
-  const callbackRef = useRef(noopFunction);
+  const [state, setState] = useState({
+    value: initialState,
+    callback: noopFunction,
+  });
 
   useEffect(() => {
-    callbackRef.current()
-  }, [state, callbackRef])
+    state.callback();
+  }, [state]);
 
   const updater = (updateFunctionOrState = {}, callback = noopFunction) => {
     if (isPlainObject(updateFunctionOrState)) {
       setState({
-        ...state,
-        ...updateFunctionOrState,
+        callback,
+        value: { ...state.value, ...updateFunctionOrState },
       });
     } else if (isFunction(updateFunctionOrState)) {
       setState({
-        ...state,
-        ...updateFunctionOrState(state, props),
+        callback,
+        value: { ...state.value, ...updateFunctionOrState(state.value, props) },
       });
     } else {
       throw new Error(
         "setState(...): takes an object of state variables to update or a function which returns an object of state variables."
       );
     }
-    callbackRef.current = callback;
   };
 
-  return [state, updater];
+  return [state.value, updater];
 }
 
 export default useSetState;
