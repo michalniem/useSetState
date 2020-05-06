@@ -1,12 +1,20 @@
-import { useState, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import isFunction from "../helpers/isFunction";
 import isPlainObject from "../helpers/isPlainObject";
 
+const noopFunction = () => {}
+
 function useSetState(initialState = {}, props = {}) {
   const [state, setState] = useState(initialState);
+  const callbackRef = useRef(noopFunction);
 
-  const updater = useCallback((updateFunctionOrState = {}, callback = () => {}) => {
+  useEffect(() => {
+    callbackRef.current()
+    console.log("Callback")
+  }, [state])
+
+  const updater = (updateFunctionOrState = {}, callback = noopFunction) => {
     if (isPlainObject(updateFunctionOrState)) {
       setState({
         ...state,
@@ -22,8 +30,8 @@ function useSetState(initialState = {}, props = {}) {
         "setState(...): takes an object of state variables to update or a function which returns an object of state variables."
       );
     }
-    callback()
-  }, [state, props]);
+    callbackRef.current = callback;
+  };
 
   return [state, updater];
 }

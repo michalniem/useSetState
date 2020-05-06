@@ -14,9 +14,7 @@ function App() {
   };
 
   const payloadWithCallbackHandler = () => {
-    setState({ name: "Console log as callback" }, () => {
-      console.log("Hello from callback");
-    });
+    setState({ name: "Console log as callback" }, () => { setState({ count: 999 }) });
   };
 
   return (
