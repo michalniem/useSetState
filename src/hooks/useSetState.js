@@ -6,26 +6,19 @@ import isPlainObject from "../helpers/isPlainObject";
 const noopFunction = () => {};
 
 function useSetState(initialState = {}, props = {}) {
-  const [state, setState] = useState({
-    value: initialState,
-    callback: noopFunction,
-  });
+  const [state, setState] = useState(initialState);
+  const callbackFuncRef = useRef(noopFunction);
 
   useEffect(() => {
-    state.callback();
+    callbackFuncRef.current()
   }, [state]);
 
   const updater = (updateFunctionOrState = {}, callback = noopFunction) => {
+    callbackFuncRef.current = callback;
     if (isPlainObject(updateFunctionOrState)) {
-      setState({
-        callback,
-        value: { ...state.value, ...updateFunctionOrState },
-      });
+      setState((state) => ({ ...state, ...updateFunctionOrState }));
     } else if (isFunction(updateFunctionOrState)) {
-      setState({
-        callback,
-        value: { ...state.value, ...updateFunctionOrState(state.value, props) },
-      });
+      setState((state) => ({ ...state, ...updateFunctionOrState(state, props) }));
     } else {
       throw new Error(
         "setState(...): takes an object of state variables to update or a function which returns an object of state variables."
@@ -33,7 +26,7 @@ function useSetState(initialState = {}, props = {}) {
     }
   };
 
-  return [state.value, updater];
+  return [state, updater];
 }
 
 export default useSetState;
