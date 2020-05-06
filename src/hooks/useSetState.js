@@ -11,8 +11,7 @@ function useSetState(initialState = {}, props = {}) {
 
   useEffect(() => {
     callbackRef.current()
-    console.log("Callback")
-  }, [state])
+  }, [state, callbackRef])
 
   const updater = (updateFunctionOrState = {}, callback = noopFunction) => {
     if (isPlainObject(updateFunctionOrState)) {
